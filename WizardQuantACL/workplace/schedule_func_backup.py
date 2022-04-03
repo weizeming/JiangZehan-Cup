@@ -1,6 +1,5 @@
 team_name = ""
-team_email = "weizeming@stu.pku.edu.cn;yyy@email;zzz@email"
-
+team_email = "xxx@email;yyy@email;zzz@email"
 
 def schedule_in_func(workers, cache, av_mem, factor_node_dict, calculated_node_dict, dsk, global_dict):
     # need to calculater

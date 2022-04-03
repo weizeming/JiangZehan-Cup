@@ -109,7 +109,7 @@ Hint：可以利用形如
 返回一个list，表示即将被清除出内存的节点。
 示例：```['node21', 'node19', 'node71', 'node74']```
 
-### 代码示例
+### 示例代码
 #### 获取未计算的因子节点（集合）
 ```python
 factor_node = set([k for k in factor_node_dict if factor_node_dict[k] is None])
