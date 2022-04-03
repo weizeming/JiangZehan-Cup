@@ -59,6 +59,7 @@ class Simulator(object):
 
         if poor_dsk_check(dsk, mem_bound):
             if not mute:
+                err = "[FAIL][Poor dsk]"
                 print("[FAIL][Poor dsk]")
             return None
 
@@ -144,6 +145,7 @@ class Simulator(object):
 
             if not wn_check:
                 if not mute:
+                    err = f"[FAIL][Poor Algo] Poor Swept. Some Args in need are not in cache now."
                     print(f"[FAIL][Poor Algo] Poor Swept. Some Args in need are not in cache now.")
                 break
 
@@ -175,16 +177,19 @@ class Simulator(object):
             time_consume += 1
             if time_consume >= time_limit:
                 if not mute:
+                    err = f"[FAIL][Poor Algo] time limit <{time_limit}> exceeded."
                     print(f"[FAIL][Poor Algo] time limit <{time_limit}> exceeded.")
                 break
 
             if look_future_check:
                 if not mute:
+                    err = "[FAIL][Poor Algo] look future. Some Args in need are not in cache now."
                     print("[FAIL][Poor Algo] look future. Some Args in need are not in cache now.")
                 break
 
             if out_of_mem:
                 if not mute:
+                    err = "[FAIL][Poor Algo] out_of_mem."
                     print("[FAIL][Poor Algo] out_of_mem.")
                 break
 
@@ -196,6 +201,8 @@ class Simulator(object):
 
             if all([workers[w] is None for w in workers]):
                 if not mute:
+                    err = "[FAIL][Poor Algo] cache_mem/mem_bound:%.5f" % (
+                            sum([dsk[c_n][0].mem for c_n in cache.keys()]) / mem_bound)
                     print("[FAIL][Poor Algo] cache_mem/mem_bound:%.5f" % (
                             sum([dsk[c_n][0].mem for c_n in cache.keys()]) / mem_bound))
                 break
@@ -390,7 +397,7 @@ if __name__ == '__main__':
     success_rate, speed_up = sim.compare([(schedule_in_demo, schedule_out_demo),
                                           (schedule_in_demo, schedule_out_demo)],
                                          mem_bound=30, node_num=1000,
-                                         analyst=analyst, 
+                                         analyst=analyst,
                                          num_cpus=10
                                          )
     print(success_rate)
