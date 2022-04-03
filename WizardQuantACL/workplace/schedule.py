@@ -22,6 +22,7 @@ def schedule_in_demo_trace(workers, cache, av_mem, factor_node_dict, calculated_
     global worker_id, demo_trace
     ori_id = worker_id
     worker_id += 1
+    print(f'worker {ori_id}:')
     if worker_id >= 10:
         worker_id = 0
     factor_node = set([k for k in factor_node_dict if factor_node_dict[k] is None])
@@ -55,16 +56,21 @@ def schedule_in_demo_trace(workers, cache, av_mem, factor_node_dict, calculated_
             if isAvailable:
                 return node
         return None
-    demo_trace.append([ori_id, int(available_node()[4:])])
+    if available_node() is not None:
+        demo_trace.append([ori_id, int(available_node()[4:])])
+    print(available_node())
     return available_node()
 
 sim.simulate(schedule_in_demo_trace, schedule_out_func, mem_bound=50, worker_bound=10,dsk=dsk,rd=rd, compare_mode=True)
-
+print('-'*100)
 print(demo_trace)
-
+print('-' * 100)
 num_workers, num_nodes = 10, 100
 
 information = np.ones((num_nodes, num_workers))
+for worker, node in demo_trace:
+    information[node, worker] += 100
+
 def topoOrder(workers, cache, av_mem, factor_node_dict, calculated_node_dict, dsk, global_dict):
     topoQueue = []
     matrix = np.zeros((num_nodes, num_nodes))
@@ -106,7 +112,7 @@ def search(dsk):
         worker_schedules[select_worker].append(node_id)
         worker_traces[node_id, select_worker] = 1
     #print(worker_schedules)
-    def search_n_func(workers, cache, av_mem, factor_node_dict, calculated_node_dict, dsk, global_dict):
+    def search_in_func(workers, cache, av_mem, factor_node_dict, calculated_node_dict, dsk, global_dict):
         global current_worker_id, iter
         ori_id = current_worker_id
 
@@ -114,8 +120,9 @@ def search(dsk):
         if current_worker_id >= num_workers:
             current_worker_id = 0
             iter += 1
+
             #print(f'\niter {iter}')
-        #print(current_worker_id)
+        print(f'worker {ori_id}:')
         if av_mem == 0:
             return None
         if len(worker_schedules[ori_id])==0:
@@ -133,9 +140,10 @@ def search(dsk):
                 return None
         worker_schedules[ori_id].remove(node_id)
         #print(node, '\n', '-'*100)
+        print(node)
         return node
 
-    result = sim.simulate(search_n_func, schedule_out_func, mem_bound=50, worker_bound=10,dsk=dsk,rd=rd, compare_mode=True)
+    result = sim.simulate(search_in_func, schedule_out_func, mem_bound=50, worker_bound=10,dsk=dsk,rd=rd, compare_mode=True)
     analyst = Analyst()
     success_rate, speed_up = analyst.run(result=[[result]])
     speed_up = speed_up.values.item()
@@ -143,7 +151,7 @@ def search(dsk):
     rewarded = np.array([reward(speed_up)]) * success_rate
     return speed_up, success_rate,  rewarded * worker_traces
 
-rd = RandomDsk(mute=True)
+
 def train(num_epochs, num_agent, alpha):
     global  information
     for epoch in range(num_epochs):
@@ -159,4 +167,4 @@ def train(num_epochs, num_agent, alpha):
         information = alpha * information + new_information
         print(f'epoch {epoch+1}: speed_up = {speed_up_total / num_agent:.3f}, success_rate = {success_total/num_agent} Use time: {time()-start_time:.1f}')
         #print(information)
-train(20, 100, 1)
+train(20, 10, 1)
