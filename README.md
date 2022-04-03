@@ -108,3 +108,35 @@ Hint：可以利用形如
 #### 返回值
 返回一个list，表示即将被清除出内存的节点。
 示例：```['node21', 'node19', 'node71', 'node74']```
+
+### 代码示例
+#### 获取未计算的因子节点（集合）
+```python
+factor_node = set([k for k in factor_node_dict if factor_node_dict[k] is None])
+```
+
+#### 获取已分配节点的worker（集合）
+```python
+workers_nodes = set([workers[k][0] for k in workers if workers[k] is not None])
+```
+
+#### 获取所有节点（集合）
+```python
+nodeList = set(dsk.keys())
+```
+
+#### 判断某数据```arg```是否为节点（可能是节点，数值或None）
+```python
+arg in nodeList
+```
+
+#### 判断某节点的计算结果不在cache内存中
+```python
+arg in nodeList and arg not in cache.keys()
+```
+
+#### 获取节点node的依赖节点
+```python
+[arg for arg in dsk[node][1:] if arg in nodeList ]
+```
+
